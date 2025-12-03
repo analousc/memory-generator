@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #e8e5df;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: #f5f3f0;
+            border-radius: 4px;
+            padding: 50px 40px 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.1),
+                0 8px 16px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Camera body details */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 6px;
+            background: #c4c0b8;
+            border-radius: 3px;
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #a8a399;
+            border-radius: 50%;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5a5550;
+            margin-bottom: 8px;
+            font-size: 1.4em;
+            font-weight: normal;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8a8580;
+            margin-bottom: 30px;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 11px;
+            border: 1px solid #5a5550;
+            background: #ffffff;
+            color: #5a5550;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover:not(:disabled) {
+            background: #5a5550;
+            color: #ffffff;
+        }
+
+        .record-btn.recording {
+            background: #8a7a6a;
+            color: #ffffff;
+            border-color: #8a7a6a;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        button:disabled {
+            background: #e8e5df;
+            color: #c4c0b8;
+            cursor: not-allowed;
+            border-color: #d4d1cc;
+        }
+
+        .clear-btn {
+            flex: 0.5;
+            background: #e8e5df;
+            border-color: #c4c0b8;
+            color: #8a8580;
+        }
+
+        .clear-btn:hover {
+            background: #c4c0b8;
+            color: #ffffff;
+        }
+
+        .transcript-area {
+            margin-bottom: 25px;
+        }
+
+        .transcript-area label {
+            display: block;
+            margin-bottom: 8px;
+            color: #5a5550;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #d4d1cc;
+            background: #ffffff;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            color: #5a5550;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a8a399;
+        }
+
+        textarea::placeholder {
+            color: #c4c0b8;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 0.8em;
+            letter-spacing: 0.5px;
+        }
+
+        .status.info {
+            background: #f5f3f0;
+            color: #8a7a6a;
+            border-left: 3px solid #8a7a6a;
+        }
+
+        .status.success {
+            background: #f5f3f0;
+            color: #6a7a6a;
+            border-left: 3px solid #6a7a6a;
+        }
+
+        .status.error {
+            background: #f5f3f0;
+            color: #9a6a6a;
+            border-left: 3px solid #9a6a6a;
+        }
+
+        .status.hidden {
+            display: none;
+        }
+
+        /* Polaroid-style image frame */
+        .image-result {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .polaroid-frame {
+            background: #ffffff;
+            padding: 15px 15px 50px 15px;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.1),
+                0 8px 16px rgba(0,0,0,0.15);
+            display: inline-block;
+            margin-top: 20px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .polaroid-frame img {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .image-caption {
+            margin-top: 15px;
+            font-size: 0.7em;
+            color: #8a8580;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loader {
+            border: 2px solid #e8e5df;
+            border-top: 2px solid #8a7a6a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #8a7a6a;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        .download-btn {
+            margin-top: 15px;
+            background: #ffffff;
+            border: 1px solid #5a5550;
+            color: #5a5550;
+            padding: 10px 20px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #5a5550;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Memory</h1>
+        <p class="subtitle">Instant Capture</p>
+
+        <div class="controls">
+            <button class="record-btn" id="recordBtn">
+                Record
+            </button>
+            <button class="generate-btn" id="generateBtn" disabled>
+                Generate
+            </button>
+            <button class="clear-btn" id="clearBtn">
+                Clear
+            </button>
+        </div>
+
+        <div class="status hidden" id="status"></div>
+
+        <div class="transcript-area">
+            <label for="transcript">Your Memory Description</label>
+            <textarea 
+                id="transcript" 
+                placeholder="describe your memory..."
+            ></textarea>
+        </div>
+
+        <div class="loader hidden" id="loader"></div>
+
+        <div class="image-result hidden" id="imageResult">
+            <div class="polaroid-frame">
+                <img id="generatedImage" alt="Generated memory visualization">
+                <div class="image-caption">Memory Captured</div>
+            </div>
+            <button class="download-btn" id="downloadBtn">Download Memory</button>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const transcript = document.getElementById('transcript');
+        const status = document.getElementById('status');
+        const loader = document.getElementById('loader');
+        const imageResult = document.getElementById('imageResult');
+        const generatedImage = document.getElementById('generatedImage');
+
+        // Speech Recognition
+        let recognition = null;
+        let isRecording = false;
+
+        // Check for browser support
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = transcript.value;
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcriptPiece = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcriptPiece + ' ';
+                    } else {
+                        interimTranscript += transcriptPiece;
+                    }
+                }
+
+                transcript.value = finalTranscript + interimTranscript;
+                updateGenerateButton();
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                showStatus('Error: ' + event.error, 'error');
+                stopRecording();
+            };
+
+            recognition.onend = () => {
+                if (isRecording) {
+                    recognition.start();
+                }
+            };
+        } else {
+            showStatus('Speech recognition not supported. Please type your memory.', 'error');
+            recordBtn.disabled = true;
+        }
+
+        // Record Button
+        recordBtn.addEventListener('click', () => {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+
+        function startRecording() {
+            if (recognition) {
+                isRecording = true;
+                recognition.start();
+                recordBtn.classList.add('recording');
+                recordBtn.innerHTML = '<span class="recording-indicator"></span>Recording';
+                showStatus('Listening... Speak your memory', 'info');
+            }
+        }
+
+        function stopRecording() {
+            if (recognition) {
+                isRecording = false;
+                recognition.stop();
+                recordBtn.classList.remove('recording');
+                recordBtn.innerHTML = 'Record';
+                showStatus('Recording stopped', 'success');
+            }
+        }
+
+        // Generate Button
+        generateBtn.addEventListener('click', async () => {
+            const memoryText = transcript.value.trim();
+
+            if (!memoryText) {
+                showStatus('Please describe your memory first', 'error');
+                return;
+            }
+
+            if (isRecording) {
+                stopRecording();
+            }
+
+            await generateImage(memoryText);
+        });
+
+        // Clear Button
+        clearBtn.addEventListener('click', () => {
+            transcript.value = '';
+            imageResult.classList.add('hidden');
+            status.classList.add('hidden');
+            updateGenerateButton();
+        });
+
+        // Download Button
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                const imageUrl = generatedImage.src;
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `memory-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                showStatus('Memory downloaded!', 'success');
+            } catch (error) {
+                console.error('Download error:', error);
+                showStatus('Error downloading image', 'error');
+            }
+        });
+
+        // Update generate button state
+        transcript.addEventListener('input', updateGenerateButton);
+
+        function updateGenerateButton() {
+            const hasText = transcript.value.trim().length > 0;
+            generateBtn.disabled = !hasText;
+        }
+
+        // Generate Image via our API
+        async function generateImage(prompt) {
+            showStatus('Generating your memory...', 'info');
+            loader.classList.remove('hidden');
+            imageResult.classList.add('hidden');
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate image');
+                }
+
+                // Display the image
+                generatedImage.src = data.imageUrl;
+                imageResult.classList.remove('hidden');
+                showStatus('Memory generated successfully!', 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Error: ' + error.message, 'error');
+            } finally {
+                loader.classList.add('hidden');
+                generateBtn.disabled = false;
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+    </script>
+</body>
+</html>
