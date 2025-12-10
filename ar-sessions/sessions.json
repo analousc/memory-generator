@@ -1,0 +1,71 @@
+{
+  "sessions": [
+    {
+      "sessionId": "1765381578117",
+      "timestamp": "2025-12-10T15:46:18.117Z",
+      "startTime": 1765381578120,
+      "imageSource": "generated",
+      "positioning": {
+        "initialPosition": {
+          "x": 50,
+          "y": 50
+        },
+        "initialScale": 1,
+        "finalPosition": {
+          "x": 30.139110783864247,
+          "y": 42.82608695652174
+        },
+        "finalScale": 1.4641000000000006,
+        "repositionCount": 146,
+        "resizeCount": 4
+      },
+      "interactions": {
+        "dragCount": 146,
+        "resetCount": 0,
+        "captureCount": 0,
+        "timeToFirstCapture": null
+      },
+      "captures": [],
+      "duration": 45,
+      "savedAt": "2025-12-10T15:47:03.909Z"
+    },
+    {
+      "sessionId": "1765381963168",
+      "timestamp": "2025-12-10T15:52:43.168Z",
+      "startTime": 1765381963168,
+      "imageSource": "uploaded",
+      "positioning": {
+        "initialPosition": {
+          "x": 50,
+          "y": 50
+        },
+        "initialScale": 1,
+        "finalPosition": {
+          "x": 50,
+          "y": 50
+        },
+        "finalScale": 1,
+        "repositionCount": 0,
+        "resizeCount": 0
+      },
+      "interactions": {
+        "dragCount": 0,
+        "resetCount": 0,
+        "captureCount": 1,
+        "timeToFirstCapture": 3
+      },
+      "captures": [
+        {
+          "timestamp": "2025-12-10T15:52:46.459Z",
+          "position": {
+            "x": 50,
+            "y": 50,
+            "scale": 1
+          }
+        }
+      ],
+      "duration": 10,
+      "savedAt": "2025-12-10T15:52:54.069Z"
+    }
+  ]
+}

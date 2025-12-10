@@ -3,350 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: #e8e5df;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
-        }
-
-        .container {
-            background: #f5f3f0;
-            border-radius: 4px;
-            padding: 50px 40px 40px;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 
-                0 2px 4px rgba(0,0,0,0.1),
-                0 8px 16px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        /* Camera body details */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 6px;
-            background: #c4c0b8;
-            border-radius: 3px;
-        }
-
-        .container::after {
-            content: '';
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            width: 12px;
-            height: 12px;
-            background: #a8a399;
-            border-radius: 50%;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        h1 {
-            text-align: center;
-            color: #5a5550;
-            margin-bottom: 8px;
-            font-size: 1.4em;
-            font-weight: normal;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #8a8580;
-            margin-bottom: 30px;
-            font-size: 0.85em;
-            letter-spacing: 1px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        button {
-            flex: 1;
-            padding: 12px 20px;
-            font-size: 11px;
-            border: 1px solid #5a5550;
-            background: #ffffff;
-            color: #5a5550;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        button:hover:not(:disabled) {
-            background: #5a5550;
-            color: #ffffff;
-        }
-
-        .record-btn.recording {
-            background: #8a7a6a;
-            color: #ffffff;
-            border-color: #8a7a6a;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        button:disabled {
-            background: #e8e5df;
-            color: #c4c0b8;
-            cursor: not-allowed;
-            border-color: #d4d1cc;
-        }
-
-        .clear-btn {
-            flex: 0.5;
-            background: #e8e5df;
-            border-color: #c4c0b8;
-            color: #8a8580;
-        }
-
-        .clear-btn:hover {
-            background: #c4c0b8;
-            color: #ffffff;
-        }
-
-        .transcript-area {
-            margin-bottom: 25px;
-        }
-
-        .transcript-area label {
-            display: block;
-            margin-bottom: 8px;
-            color: #5a5550;
-            font-size: 0.75em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            border: 1px solid #d4d1cc;
-            background: #ffffff;
-            font-size: 13px;
-            font-family: 'Courier New', monospace;
-            resize: vertical;
-            color: #5a5550;
-            line-height: 1.6;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #a8a399;
-        }
-
-        textarea::placeholder {
-            color: #c4c0b8;
-        }
-
-        .status {
-            text-align: center;
-            padding: 10px;
-            margin-bottom: 20px;
-            font-size: 0.8em;
-            letter-spacing: 0.5px;
-        }
-
-        .status.info {
-            background: #f5f3f0;
-            color: #8a7a6a;
-            border-left: 3px solid #8a7a6a;
-        }
-
-        .status.success {
-            background: #f5f3f0;
-            color: #6a7a6a;
-            border-left: 3px solid #6a7a6a;
-        }
-
-        .status.error {
-            background: #f5f3f0;
-            color: #9a6a6a;
-            border-left: 3px solid #9a6a6a;
-        }
-
-        .status.hidden {
-            display: none;
-        }
-
-        /* Polaroid-style image frame */
-        .image-result {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .polaroid-frame {
-            background: #ffffff;
-            padding: 15px 15px 50px 15px;
-            box-shadow: 
-                0 2px 4px rgba(0,0,0,0.1),
-                0 8px 16px rgba(0,0,0,0.15);
-            display: inline-block;
-            margin-top: 20px;
-            animation: slideDown 0.6s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .polaroid-frame img {
-            display: block;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .image-caption {
-            margin-top: 15px;
-            font-size: 0.7em;
-            color: #8a8580;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .loader {
-            border: 2px solid #e8e5df;
-            border-top: 2px solid #8a7a6a;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .recording-indicator {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: #8a7a6a;
-            border-radius: 50%;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-
-        .download-btn {
-            margin-top: 15px;
-            background: #ffffff;
-            border: 1px solid #5a5550;
-            color: #5a5550;
-            padding: 10px 20px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            transition: all 0.2s ease;
-        }
-
-        .download-btn:hover {
-            background: #5a5550;
-            color: #ffffff;
-        }
-    </style>
+    <title>borne back</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Memory</h1>
-        <p class="subtitle">Instant Capture</p>
-
-        <div class="controls">
-            <button class="record-btn" id="recordBtn">
-                Record
-            </button>
-            <button class="generate-btn" id="generateBtn" disabled>
-                Generate
-            </button>
-            <button class="clear-btn" id="clearBtn">
-                Clear
-            </button>
-        </div>
-
-        <div class="status hidden" id="status"></div>
-
-        <div class="transcript-area">
-            <label for="transcript">Your Memory Description</label>
-            <textarea 
-                id="transcript" 
-                placeholder="describe your memory..."
-            ></textarea>
-        </div>
-
-        <div class="loader hidden" id="loader"></div>
-
-        <div class="image-result hidden" id="imageResult">
-            <div class="polaroid-frame">
-                <img id="generatedImage" alt="Generated memory visualization">
-                <div class="image-caption">Memory Captured</div>
+    <!-- Landing Screen -->
+    <div class="screen active" id="landing">
+        <!-- Heatmap canvas behind content -->
+        <canvas id="landingHeatmap" width="800" height="600"></canvas>
+        
+        <h1>borne back</h1>
+        <div class="subtitle" id="subtitle"></div>
+        <button onclick="goToScreen('describeScreen')" style="opacity: 0;" id="beginBtn">begin</button>
+        
+        <div style="position: absolute; bottom: 40px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="skip-link">
+                <a href="#" onclick="goToScreen('arUploadScreen'); return false;">or view your own photos in AR</a>
             </div>
-            <button class="download-btn" id="downloadBtn">Download Memory</button>
+        </div>
+    </div>
+
+    <!-- Describe People Screen -->
+    <div class="screen" id="describeScreen">
+        <div class="screen-content">
+            <h2>who appears in this memory?</h2>
+            <p class="instruction">describing them helps us visualize your memory more clearly<br>(or skip if no one specific)</p>
+            
+            <div class="person-input">
+                <label>their name</label>
+                <input type="text" id="personName" placeholder="">
+            </div>
+
+            <div class="person-input">
+                <label>describe their appearance</label>
+                <textarea id="personDescription" rows="4" placeholder=""></textarea>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-primary" onclick="savePersonAndContinue()">continue</button>
+            </div>
+
+            <div class="skip-link">
+                <a href="#" onclick="goToScreen('recordScreen'); return false;">skip this step</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Memory Screen -->
+    <div class="screen" id="recordScreen">
+        <div class="screen-content">
+            <h2>record your memory</h2>
+            <p class="instruction">speak aloud or type the memory you want to preserve</p>
+
+            <div class="controls">
+                <button class="record-btn" id="recordBtn">speak</button>
+            </div>
+
+            <textarea 
+                id="memoryText" 
+                placeholder="describe your memory in detail..."
+            ></textarea>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="goToScreen('describeScreen')">back</button>
+                <button class="btn-primary" id="continueToGenerate" onclick="goToScreen('generateScreen')" disabled>continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Screen -->
+    <div class="screen" id="generateScreen">
+        <div class="screen-content">
+            <h2>bringing memory to life</h2>
+            <p class="instruction">translating your words into a visual memory...</p>
+
+            <div class="status" id="generateStatus">Generating your memory...</div>
+
+            <div class="loader" id="loader"></div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div class="screen" id="resultScreen">
+        <div class="screen-content" style="max-width: 700px;">
+            <h2>memory captured</h2>
+            
+            <div style="text-align: center;">
+                <div class="polaroid-frame">
+                    <img id="generatedImage" alt="Generated memory">
+                    <div class="image-caption">Memory Captured</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button onclick="downloadImage()">download</button>
+                <button onclick="openARWithGenerated()">view this in AR</button>
+                <button onclick="openARUpload()">view your own photo in AR</button>
+                <button onclick="resetJourney()">create another</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AR Upload Screen -->
+    <div class="screen" id="arUploadScreen">
+        <div class="screen-content">
+            <h2>view in augmented reality</h2>
+            <p class="instruction">upload any photo to place it in your physical space</p>
+            
+            <div class="person-input">
+                <label>select an image</label>
+                <input type="file" id="arImageUpload" accept="image/*" onchange="handleARUpload(event)">
+            </div>
+
+            <div id="arUploadPreview" class="hidden" style="text-align: center; margin: 30px 0;">
+                <img id="arPreviewImage" style="max-width: 300px; border: 1px solid rgba(138, 133, 128, 0.3);">
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="goBackFromARUpload()">back</button>
+                <button class="btn-primary" id="startARBtn" onclick="startARWithUpload()" disabled>start AR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AR Viewer Screen -->
+    <div class="screen" id="arScreen">
+        <button class="close-ar" onclick="closeAR()">✕ close</button>
+        
+        <div class="ar-container">
+            <video id="arVideo" autoplay playsinline></video>
+            <canvas id="arCanvas"></canvas>
+            
+            <!-- Draggable AR Image -->
+            <div id="arImageContainer"></div>
+            
+            <!-- Size Controls -->
+            <div class="size-controls">
+                <button onclick="resizeARImage(1.1)" title="Increase size">+</button>
+                <button onclick="resizeARImage(0.9)" title="Decrease size">−</button>
+            </div>
+            
+            <!-- AR Controls -->
+            <div class="ar-controls">
+                <div class="ar-buttons">
+                    <button onclick="captureARView()">capture view</button>
+                    <button onclick="resetARPosition()">reset position</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fallback for unsupported devices -->
+        <div class="ar-not-supported hidden" id="arNotSupported">
+            <h3>camera access required</h3>
+            <p>please allow camera access to view your memory in augmented reality</p>
+            <p style="font-size: 0.8em; margin-top: 20px;">or open this page on a mobile device with camera</p>
+            <div style="margin-top: 30px;">
+                <button onclick="closeAR()" class="btn-secondary">go back</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Elements
-        const recordBtn = document.getElementById('recordBtn');
-        const generateBtn = document.getElementById('generateBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const transcript = document.getElementById('transcript');
-        const status = document.getElementById('status');
-        const loader = document.getElementById('loader');
-        const imageResult = document.getElementById('imageResult');
-        const generatedImage = document.getElementById('generatedImage');
+        // State
+        let currentScreen = 'landing';
+        let personData = { name: '', description: '' };
+        let memoryText = '';
+        let generatedImageUrl = '';
 
-        // Speech Recognition
+        // Speech recognition
         let recognition = null;
         let isRecording = false;
 
-        // Check for browser support
+        // Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const memoryTextArea = document.getElementById('memoryText');
+        const continueToGenerateBtn = document.getElementById('continueToGenerate');
+        const generatedImage = document.getElementById('generatedImage');
+        const subtitle = document.getElementById('subtitle');
+        const beginBtn = document.getElementById('beginBtn');
+
+        // Typing animation for subtitle with AI emphasis
+        const text = "artificial recollection";
+        let index = 0;
+
+        function typeWriter() {
+            if (index < text.length) {
+                const char = text.charAt(index);
+                
+                // Bold and animate 'a' (position 0) and first 'i' (position 3) in 'artificial'
+                if (index === 0 || index === 3) {
+                    subtitle.innerHTML += `<span class="ai-letter">${char}</span>`;
+                } else {
+                    subtitle.innerHTML += char;
+                }
+                
+                index++;
+                setTimeout(typeWriter, 80);
+            } else {
+                // Show cursor briefly then fade in button
+                subtitle.innerHTML += '<span class="cursor">_</span>';
+                setTimeout(() => {
+                    beginBtn.style.transition = 'opacity 1s ease';
+                    beginBtn.style.opacity = '1';
+                }, 500);
+            }
+        }
+
+        // Start typing animation on load
+        setTimeout(typeWriter, 1000);
+        
+        // Draw landing heatmap on load
+        setTimeout(() => {
+            drawLandingHeatmap();
+        }, 1500);
+
+        // Initialize speech recognition
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -356,7 +230,7 @@
 
             recognition.onresult = (event) => {
                 let interimTranscript = '';
-                let finalTranscript = transcript.value;
+                let finalTranscript = memoryTextArea.value;
 
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const transcriptPiece = event.results[i][0].transcript;
@@ -367,13 +241,12 @@
                     }
                 }
 
-                transcript.value = finalTranscript + interimTranscript;
-                updateGenerateButton();
+                memoryTextArea.value = finalTranscript + interimTranscript;
+                updateContinueButton();
             };
 
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
-                showStatus('Error: ' + event.error, 'error');
                 stopRecording();
             };
 
@@ -383,11 +256,35 @@
                 }
             };
         } else {
-            showStatus('Speech recognition not supported. Please type your memory.', 'error');
             recordBtn.disabled = true;
+            recordBtn.textContent = 'type only';
         }
 
-        // Record Button
+        // Screen navigation
+        function goToScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.getElementById(screenId).classList.add('active');
+                currentScreen = screenId;
+
+                // Auto-generate when reaching generate screen
+                if (screenId === 'generateScreen') {
+                    generateImage();
+                }
+            }, 100);
+        }
+
+        // Save person data and continue
+        function savePersonAndContinue() {
+            personData.name = document.getElementById('personName').value.trim();
+            personData.description = document.getElementById('personDescription').value.trim();
+            goToScreen('recordScreen');
+        }
+
+        // Recording
         recordBtn.addEventListener('click', () => {
             if (!isRecording) {
                 startRecording();
@@ -401,8 +298,7 @@
                 isRecording = true;
                 recognition.start();
                 recordBtn.classList.add('recording');
-                recordBtn.innerHTML = '<span class="recording-indicator"></span>Recording';
-                showStatus('Listening... Speak your memory', 'info');
+                recordBtn.innerHTML = '<span class="recording-indicator"></span>recording';
             }
         }
 
@@ -411,70 +307,32 @@
                 isRecording = false;
                 recognition.stop();
                 recordBtn.classList.remove('recording');
-                recordBtn.innerHTML = 'Record';
-                showStatus('Recording stopped', 'success');
+                recordBtn.textContent = 'speak';
             }
         }
 
-        // Generate Button
-        generateBtn.addEventListener('click', async () => {
-            const memoryText = transcript.value.trim();
+        // Update continue button
+        memoryTextArea.addEventListener('input', updateContinueButton);
 
-            if (!memoryText) {
-                showStatus('Please describe your memory first', 'error');
-                return;
-            }
+        function updateContinueButton() {
+            const hasText = memoryTextArea.value.trim().length > 0;
+            continueToGenerateBtn.disabled = !hasText;
+        }
 
+        // Generate image
+        async function generateImage() {
+            memoryText = memoryTextArea.value.trim();
+            
             if (isRecording) {
                 stopRecording();
             }
 
-            await generateImage(memoryText);
-        });
-
-        // Clear Button
-        clearBtn.addEventListener('click', () => {
-            transcript.value = '';
-            imageResult.classList.add('hidden');
-            status.classList.add('hidden');
-            updateGenerateButton();
-        });
-
-        // Download Button
-        downloadBtn.addEventListener('click', async () => {
-            try {
-                const imageUrl = generatedImage.src;
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `memory-${Date.now()}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                showStatus('Memory downloaded!', 'success');
-            } catch (error) {
-                console.error('Download error:', error);
-                showStatus('Error downloading image', 'error');
+            // Build enhanced prompt with person description if provided
+            let prompt = memoryText;
+            
+            if (personData.name && personData.description) {
+                prompt = `${memoryText}. The scene includes ${personData.name}, ${personData.description}.`;
             }
-        });
-
-        // Update generate button state
-        transcript.addEventListener('input', updateGenerateButton);
-
-        function updateGenerateButton() {
-            const hasText = transcript.value.trim().length > 0;
-            generateBtn.disabled = !hasText;
-        }
-
-        // Generate Image via our API
-        async function generateImage(prompt) {
-            showStatus('Generating your memory...', 'info');
-            loader.classList.remove('hidden');
-            imageResult.classList.add('hidden');
-            generateBtn.disabled = true;
 
             try {
                 const response = await fetch('/api/generate', {
@@ -491,24 +349,633 @@
                     throw new Error(data.error || 'Failed to generate image');
                 }
 
-                // Display the image
-                generatedImage.src = data.imageUrl;
-                imageResult.classList.remove('hidden');
-                showStatus('Memory generated successfully!', 'success');
+                generatedImageUrl = data.imageUrl;
+                generatedImage.src = generatedImageUrl;
+                
+                // Transition to result screen
+                setTimeout(() => {
+                    goToScreen('resultScreen');
+                }, 500);
 
             } catch (error) {
                 console.error('Error:', error);
-                showStatus('Error: ' + error.message, 'error');
-            } finally {
-                loader.classList.add('hidden');
-                generateBtn.disabled = false;
+                document.getElementById('generateStatus').textContent = 'Error: ' + error.message;
+                document.getElementById('loader').classList.add('hidden');
             }
         }
 
-        // Show status message
-        function showStatus(message, type) {
-            status.textContent = message;
-            status.className = `status ${type}`;
+        // Download image
+        async function downloadImage() {
+            try {
+                const response = await fetch(generatedImageUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `memory-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Download error:', error);
+            }
+        }
+
+        // Reset journey
+        function resetJourney() {
+            // Clear state
+            personData = { name: '', description: '' };
+            memoryText = '';
+            generatedImageUrl = '';
+            
+            // Clear inputs
+            document.getElementById('personName').value = '';
+            document.getElementById('personDescription').value = '';
+            memoryTextArea.value = '';
+            
+            // Reset loader
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('generateStatus').textContent = 'Generating your memory...';
+            
+            // Go to landing
+            goToScreen('landing');
+            
+            // Redraw heatmap (in case new session was added)
+            setTimeout(() => {
+                drawLandingHeatmap();
+            }, 300);
+        }
+
+        // ===== AR VIEWER FUNCTIONALITY =====
+
+        let arStream = null;
+        let arImageScale = 1;
+        let arImagePosition = { x: 50, y: 50 }; // percentage
+        let arCurrentImage = null; // Store current AR image URL
+        let arSessionData = null; // Current session tracking
+
+        // Draw heatmap on landing page
+        async function drawLandingHeatmap() {
+            const canvas = document.getElementById('landingHeatmap');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const sessions = await getARSessions();
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (sessions.length === 0) return;
+            
+            // Draw heatmap points (no grid, just dots)
+            sessions.forEach(session => {
+                const pos = session.positioning.finalPosition;
+                if (!pos) return;
+                
+                const x = (pos.x / 100) * canvas.width;
+                const y = (pos.y / 100) * canvas.height;
+                
+                // Draw gradient circle (more subtle than analytics version)
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, 35);
+                gradient.addColorStop(0, 'rgba(232, 229, 223, 0.25)');
+                gradient.addColorStop(0.5, 'rgba(196, 192, 184, 0.12)');
+                gradient.addColorStop(1, 'rgba(138, 133, 128, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(x, y, 35, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw center point (subtle)
+                ctx.fillStyle = 'rgba(232, 229, 223, 0.4)';
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // Start AR session tracking
+        function startARSession(imageSource) {
+            arSessionData = {
+                sessionId: Date.now().toString(),
+                timestamp: new Date().toISOString(),
+                startTime: Date.now(),
+                imageSource: imageSource, // 'generated' or 'uploaded'
+                
+                positioning: {
+                    initialPosition: { x: arImagePosition.x, y: arImagePosition.y },
+                    initialScale: arImageScale,
+                    finalPosition: null,
+                    finalScale: null,
+                    repositionCount: 0,
+                    resizeCount: 0
+                },
+                
+                interactions: {
+                    dragCount: 0,
+                    resetCount: 0,
+                    captureCount: 0,
+                    timeToFirstCapture: null
+                },
+                
+                captures: []
+            };
+            
+            console.log('AR session started:', arSessionData.sessionId);
+        }
+
+        // Track drag event
+        function trackDrag() {
+            if (arSessionData) {
+                arSessionData.interactions.dragCount++;
+                arSessionData.positioning.repositionCount++;
+            }
+        }
+
+        // Track resize event
+        function trackResize() {
+            if (arSessionData) {
+                arSessionData.positioning.resizeCount++;
+            }
+        }
+
+        // Track reset event
+        function trackReset() {
+            if (arSessionData) {
+                arSessionData.interactions.resetCount++;
+            }
+        }
+
+        // Track capture event
+        function trackCapture() {
+            if (arSessionData) {
+                arSessionData.interactions.captureCount++;
+                
+                // Time to first capture
+                if (arSessionData.interactions.captureCount === 1) {
+                    const elapsed = Math.floor((Date.now() - arSessionData.startTime) / 1000);
+                    arSessionData.interactions.timeToFirstCapture = elapsed;
+                }
+                
+                // Record this capture
+                arSessionData.captures.push({
+                    timestamp: new Date().toISOString(),
+                    position: {
+                        x: arImagePosition.x,
+                        y: arImagePosition.y,
+                        scale: arImageScale
+                    }
+                });
+            }
+        }
+
+        // End AR session and save
+        function endARSession() {
+            if (arSessionData) {
+                const endTime = Date.now();
+                arSessionData.duration = Math.floor((endTime - arSessionData.startTime) / 1000);
+                
+                arSessionData.positioning.finalPosition = {
+                    x: arImagePosition.x,
+                    y: arImagePosition.y
+                };
+                arSessionData.positioning.finalScale = arImageScale;
+                
+                // Save to localStorage
+                saveARSession(arSessionData);
+                
+                console.log('AR session ended:', arSessionData);
+                arSessionData = null;
+            }
+        }
+
+        // Save AR session to localStorage
+        function saveARSession(sessionData) {
+            // Save to localStorage as backup
+            const localSessions = JSON.parse(localStorage.getItem('arSessions') || '[]');
+            localSessions.push(sessionData);
+            
+            // Keep only last 100 sessions locally
+            if (localSessions.length > 100) {
+                localSessions.splice(0, localSessions.length - 100);
+            }
+            
+            localStorage.setItem('arSessions', JSON.stringify(localSessions));
+            
+            // Also save to backend
+            fetch('/api/ar/session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sessionData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('AR session saved to backend:', data.totalSessions, 'total sessions');
+                } else {
+                    console.error('Failed to save to backend:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving to backend:', error);
+                // Data is still saved locally, so we can continue
+            });
+        }
+
+        // Get all AR sessions from backend
+        async function getARSessions() {
+            try {
+                // Try to fetch from backend first
+                const response = await fetch('/api/ar/sessions');
+                const data = await response.json();
+                
+                if (data.success && data.sessions) {
+                    console.log('Loaded', data.totalSessions, 'sessions from backend');
+                    return data.sessions;
+                }
+            } catch (error) {
+                console.error('Error loading from backend:', error);
+            }
+            
+            // Fallback to localStorage
+            console.log('Using localStorage fallback');
+            return JSON.parse(localStorage.getItem('arSessions') || '[]');
+        }
+
+        // Get AR analytics
+        function getARAnalytics() {
+            const sessions = getARSessions();
+            
+            if (sessions.length === 0) return null;
+            
+            return {
+                totalSessions: sessions.length,
+                totalCaptures: sessions.reduce((sum, s) => sum + s.interactions.captureCount, 0),
+                averageDuration: Math.round(sessions.reduce((sum, s) => sum + s.duration, 0) / sessions.length),
+                averageRepositions: Math.round(sessions.reduce((sum, s) => sum + s.positioning.repositionCount, 0) / sessions.length * 10) / 10,
+                averageTimeToCapture: sessions
+                    .filter(s => s.interactions.timeToFirstCapture)
+                    .reduce((sum, s) => sum + s.interactions.timeToFirstCapture, 0) / sessions.filter(s => s.interactions.timeToFirstCapture).length,
+                
+                positions: sessions.map(s => s.positioning.finalPosition),
+                scales: sessions.map(s => s.positioning.finalScale)
+            };
+        }
+
+        // Clear all AR data
+        function clearARData() {
+            if (confirm('Delete all AR session data? This cannot be undone.')) {
+                localStorage.removeItem('arSessions');
+                refreshAnalytics();
+                alert('All AR data cleared');
+            }
+        }
+
+        // Export AR data
+        function exportARData() {
+            const sessions = getARSessions();
+            const analytics = getARAnalytics();
+            
+            const exportData = {
+                metadata: {
+                    exportedAt: new Date().toISOString(),
+                    totalSessions: sessions.length,
+                    deviceType: /mobile/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+                },
+                analytics: analytics,
+                sessions: sessions
+            };
+            
+            // Download as JSON
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ar-data-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Draw heatmap
+        // Open AR with generated image
+        function openARWithGenerated() {
+            if (!generatedImageUrl) {
+                alert('No image to display in AR');
+                return;
+            }
+            arCurrentImage = generatedImageUrl;
+            openARViewer();
+        }
+
+        // Open AR upload screen
+        function openARUpload() {
+            goToScreen('arUploadScreen');
+        }
+
+        // Go back from AR upload
+        function goBackFromARUpload() {
+            if (generatedImageUrl) {
+                goToScreen('resultScreen');
+            } else {
+                goToScreen('landing');
+            }
+        }
+
+        // Handle AR image upload
+        function handleARUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                arCurrentImage = e.target.result;
+                
+                // Show preview
+                document.getElementById('arPreviewImage').src = arCurrentImage;
+                document.getElementById('arUploadPreview').classList.remove('hidden');
+                document.getElementById('startARBtn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Start AR with uploaded image
+        function startARWithUpload() {
+            if (!arCurrentImage) {
+                alert('Please upload an image first');
+                return;
+            }
+            openARViewer();
+        }
+
+        // Open AR viewer (unified function)
+        async function openARViewer() {
+            if (!arCurrentImage) {
+                alert('No image to display in AR');
+                return;
+            }
+
+            goToScreen('arScreen');
+
+            // Start session tracking
+            const source = arCurrentImage === generatedImageUrl ? 'generated' : 'uploaded';
+            startARSession(source);
+
+            try {
+                // Request camera access
+                arStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment', // Use back camera
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+
+                const video = document.getElementById('arVideo');
+                video.srcObject = arStream;
+
+                // Create AR image element
+                const container = document.getElementById('arImageContainer');
+                container.innerHTML = `
+                    <div class="ar-image polaroid" id="arImage" style="
+                        left: ${arImagePosition.x}%;
+                        top: ${arImagePosition.y}%;
+                        transform: translate(-50%, -50%) scale(${arImageScale});
+                    ">
+                        <img src="${arCurrentImage}" style="width: 100%; display: block;">
+                    </div>
+                `;
+
+                // Make image draggable
+                makeARImageDraggable();
+
+                // Hide not supported message
+                document.getElementById('arNotSupported').classList.add('hidden');
+
+            } catch (error) {
+                console.error('Camera access error:', error);
+                document.getElementById('arNotSupported').classList.remove('hidden');
+                document.querySelector('.ar-container').style.display = 'none';
+                
+                // End failed session
+                endARSession();
+            }
+        }
+
+        // Close AR viewer
+        function closeAR() {
+            // End session tracking
+            endARSession();
+            
+            if (arStream) {
+                arStream.getTracks().forEach(track => track.stop());
+                arStream = null;
+            }
+
+            // Return to appropriate screen
+            if (generatedImageUrl) {
+                goToScreen('resultScreen');
+            } else {
+                goToScreen('landing');
+                // Redraw heatmap with new session
+                setTimeout(() => {
+                    drawLandingHeatmap();
+                }, 300);
+            }
+        }
+
+        // Make AR image draggable
+        function makeARImageDraggable() {
+            const arImage = document.getElementById('arImage');
+            if (!arImage) return;
+
+            let isDragging = false;
+            let startX, startY;
+
+            // Mouse events
+            arImage.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+
+            // Touch events
+            arImage.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                startDrag({ clientX: touch.clientX, clientY: touch.clientY });
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                drag({ clientX: touch.clientX, clientY: touch.clientY });
+            });
+
+            document.addEventListener('touchend', endDrag);
+
+            function startDrag(e) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                arImage.style.cursor = 'grabbing';
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                // Update position
+                arImagePosition.x += (deltaX / window.innerWidth) * 100;
+                arImagePosition.y += (deltaY / window.innerHeight) * 100;
+
+                // Clamp to screen bounds
+                arImagePosition.x = Math.max(10, Math.min(90, arImagePosition.x));
+                arImagePosition.y = Math.max(10, Math.min(90, arImagePosition.y));
+
+                arImage.style.left = arImagePosition.x + '%';
+                arImage.style.top = arImagePosition.y + '%';
+
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                // Track interaction
+                trackDrag();
+            }
+
+            function endDrag() {
+                isDragging = false;
+                arImage.style.cursor = 'move';
+            }
+
+            // Pinch to zoom (touch)
+            let initialDistance = 0;
+            arImage.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    initialDistance = Math.sqrt(dx * dx + dy * dy);
+                }
+            });
+
+            arImage.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    const scale = distance / initialDistance;
+                    arImageScale *= scale;
+                    arImageScale = Math.max(0.3, Math.min(3, arImageScale));
+
+                    arImage.style.transform = `translate(-50%, -50%) scale(${arImageScale})`;
+                    initialDistance = distance;
+                }
+            });
+        }
+
+        // Resize AR image
+        function resizeARImage(factor) {
+            arImageScale *= factor;
+            arImageScale = Math.max(0.3, Math.min(3, arImageScale));
+
+            const arImage = document.getElementById('arImage');
+            if (arImage) {
+                arImage.style.transform = `translate(-50%, -50%) scale(${arImageScale})`;
+            }
+            
+            // Track interaction
+            trackResize();
+        }
+
+        // Reset AR position
+        function resetARPosition() {
+            arImageScale = 1;
+            arImagePosition = { x: 50, y: 50 };
+
+            const arImage = document.getElementById('arImage');
+            if (arImage) {
+                arImage.style.left = '50%';
+                arImage.style.top = '50%';
+                arImage.style.transform = 'translate(-50%, -50%) scale(1)';
+            }
+            
+            // Track interaction
+            trackReset();
+        }
+
+        // Capture AR view
+        function captureARView() {
+            const video = document.getElementById('arVideo');
+            const arImage = document.getElementById('arImage');
+            const canvas = document.getElementById('arCanvas');
+
+            if (!video || !arImage || !canvas) return;
+
+            // Set canvas size to match video
+            canvas.width = video.videoWidth || window.innerWidth;
+            canvas.height = video.videoHeight || window.innerHeight;
+
+            const ctx = canvas.getContext('2d');
+
+            // Draw video frame
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Draw AR image on top
+            const img = arImage.querySelector('img');
+            if (img) {
+                const rect = arImage.getBoundingClientRect();
+                const scaleX = canvas.width / window.innerWidth;
+                const scaleY = canvas.height / window.innerHeight;
+
+                ctx.save();
+                ctx.translate(
+                    rect.left * scaleX + (rect.width * scaleX) / 2,
+                    rect.top * scaleY + (rect.height * scaleY) / 2
+                );
+                ctx.scale(arImageScale, arImageScale);
+                
+                // Draw white polaroid border
+                const borderSize = 10 * scaleX;
+                const captionHeight = 30 * scaleY;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(
+                    -(rect.width * scaleX) / 2,
+                    -(rect.height * scaleY) / 2,
+                    rect.width * scaleX,
+                    rect.height * scaleY
+                );
+
+                // Draw image
+                ctx.drawImage(
+                    img,
+                    -(rect.width * scaleX) / 2 + borderSize,
+                    -(rect.height * scaleY) / 2 + borderSize,
+                    rect.width * scaleX - borderSize * 2,
+                    rect.height * scaleY - borderSize * 2 - captionHeight
+                );
+
+                ctx.restore();
+            }
+
+            // Download captured image
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ar-memory-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // Track interaction
+            trackCapture();
         }
     </script>
 </body>
